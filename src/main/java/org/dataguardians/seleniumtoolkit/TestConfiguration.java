@@ -2,8 +2,9 @@ package org.dataguardians.seleniumtoolkit;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.dataguardians.seleniumtoolkit.capabilities.Variables;
-import org.dataguardians.seleniumtoolkit.configuration.PageExecutions;
+import org.dataguardians.seleniumtoolkit.actions.PageExecutable;
+import org.dataguardians.seleniumtoolkit.actions.capabilities.Variables;
+import org.dataguardians.seleniumtoolkit.actions.configuration.PageExecutions;
 import org.yaml.snakeyaml.Yaml;
 
 
@@ -65,12 +66,11 @@ public class TestConfiguration {
                                             try {
 
                                                 System.out.println("key is " + key);
-                                                Class<?> paClazz = Class.forName("selenium.actions." + key);
+                                                Class<?> paClazz = Class.forName("org.dataguardians.seleniumtoolkit.actions." + key);
                                                 Object actionObj = paClazz.getConstructor().newInstance();
                                                 Map<String,Object> options = (LinkedHashMap<String, Object>) actionMap.get(key);
                                                 if (null != options ) {
                                                     for (String optionKey : options.keySet()) {
-                                                        System.out.println("  **** setting " + optionKey);
                                                         var value = options.get(optionKey);
                                                         if (value instanceof String) {
                                                             value = Variables.replaceVariables(value.toString(),configuration.variables);

@@ -1,0 +1,43 @@
+variables:
+  baseUrl: https://saucedemo.com
+RunOrder:
+    - validLogin
+    - invalidLogin
+invalidLogin:
+  startUrl: ${baseUrl}/
+  actions:
+    - IdWait:
+        id: login-button
+    - FieldFill:
+        field: user-name
+        value: standard_user
+    - FieldFill:
+        field: password
+        value: fake-password
+    - SubmitButton:
+        buttonName: login-button
+    - ValidateUrl:
+        url: /
+
+validLogin:
+  startUrl: ${baseUrl}/
+  actions:
+    - IdWait:
+        id: login-button
+    - FieldFill:
+        field: user-name
+        value: standard_user
+    - FieldFill:
+        field: password
+        value: secret_sauce
+    - SubmitButton:
+        buttonName: login-button
+    - ValidateUrl:
+        url: inventory.html
+    - ClickButton:
+        buttonName: bm-burger-button
+        type: class
+    - IdWait:
+        id: logout_sidebar_link
+    - NavigateLink:
+        id: logout_sidebar_link

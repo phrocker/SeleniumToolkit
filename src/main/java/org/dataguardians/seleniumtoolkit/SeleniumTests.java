@@ -1,9 +1,13 @@
 package org.dataguardians.seleniumtoolkit;
 
+import com.google.common.collect.Maps;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.dataguardians.seleniumtoolkit.configuration.PageExecutions;
+import org.dataguardians.seleniumtoolkit.actions.PageAction;
+import org.dataguardians.seleniumtoolkit.actions.PageMapping;
+import org.dataguardians.seleniumtoolkit.actions.PageValidation;
+import org.dataguardians.seleniumtoolkit.actions.configuration.PageExecutions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -12,13 +16,16 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -98,45 +105,62 @@ public class SeleniumTests {
         return valid.get();
     }
 
-    public static void runTests() {
+    public static void runTest(WebDriver driver, List<Map.Entry<String,Boolean>> executionResults, Path yamlFile) throws IOException {
+        // Open an InputStream for each file
+        try (InputStream inputStream = Files.newInputStream(yamlFile)) {
+            // Handle the input stream (read content, etc.)
+            TestConfiguration test = TestConfiguration.yamlParser(inputStream);
+            for(String job : test.order) {
+
+                log.trace("Running " + job);
+                PageExecutions pe = test.jobs.get(job);
+                try {
+                    executionResults.add(Maps.immutableEntry(job,execute(job, driver, pe) ));
+                    //executionResults.add( "\t" + job + "\t" + execute(job, driver, pe) );
+                } catch (Exception e) {
+                    executionResults.add(Maps.immutableEntry(job,false ));
+                    //executionResults.add("\t" + job + "\t failed");
+                    log.error("Error running " + job, e);
+                }
+            }
+        }
+    }
+
+    public static void runTests() throws URISyntaxException {
+        var resourceDirUrl = Thread.currentThread().getContextClassLoader().getResource("yaml/");
+
+        // Convert URL to a Path
+        Path resourceDirPath = Paths.get(resourceDirUrl.toURI());
+
+        runTestsDirectory(resourceDirPath,true);
+    }
+
+    public static void runTestsDirectory(Path yamlDirectory, boolean headless) {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
+        if (headless) {
+            options.addArguments("--headless=new");
+        }
         WebDriver driver = new ChromeDriver(options);
 
         //Map<String, Boolean> successMetrics = new HashMap<>();
-        List<String> executionResults = new ArrayList<>();
+        List<Map.Entry<String,Boolean>> executionResults = new ArrayList<>();
         try {
 
             // Get the URL of the directory (relative to the classpath)
-            var resourceDirUrl = Thread.currentThread().getContextClassLoader().getResource("yaml/");
-
-            // Convert URL to a Path
-            Path resourceDirPath = Paths.get(resourceDirUrl.toURI());
 
             // List .yaml files only
-            List<Path> yamlFiles = Files.list(resourceDirPath)
+            List<Path> yamlFiles = Files.list(yamlDirectory)
                     .filter(path -> path.toString().endsWith(".yaml") || path.toString().endsWith(".yml"))
                     .collect(Collectors.toList());
 
             // Read each file serially
-            for (Path yamlFile : yamlFiles) {
-                // Open an InputStream for each file
-                try (InputStream inputStream = Files.newInputStream(yamlFile)) {
-                    // Handle the input stream (read content, etc.)
-                    TestConfiguration test = TestConfiguration.yamlParser(inputStream);
-                    for(String job : test.order) {
-
-                        log.trace("Running " + job);
-                        PageExecutions pe = test.jobs.get(job);
-                        try {
-                            executionResults.add( "\t" + job + "\t" + execute(job, driver, pe));
-                        } catch (Exception e) {
-                            executionResults.add( "\t" + job + "\t failed");
-                            log.error("Error running " + job, e);
-                        }
-                    }
+            yamlFiles.forEach(file -> {
+                try {
+                    runTest(driver,executionResults,file);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-            }
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,7 +168,42 @@ public class SeleniumTests {
         finally{
             driver.quit();
         }
-        executionResults.forEach(System.out::println);
+        executionResults.forEach(entry ->{
+            System.out.println("\t" + entry.getKey() + "\t " + entry.getValue());
+        });
+    }
+
+    public static List<Map.Entry<String,Boolean>> testTestFile(Path testFile, boolean headless) {
+        ChromeOptions options = new ChromeOptions();
+        if (headless) {
+            options.addArguments("--headless=new");
+        }
+        WebDriver driver = new ChromeDriver(options);
+
+        //Map<String, Boolean> successMetrics = new HashMap<>();
+        List<Map.Entry<String,Boolean>> executionResults = new ArrayList<>();
+        try {
+
+            // Get the URL of the directory (relative to the classpath)
+
+            // Read each file serially
+
+            try {
+                runTest(driver,executionResults,testFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally{
+            driver.quit();
+        }
+
+        return executionResults;
+
     }
 
     static {
@@ -154,7 +213,7 @@ public class SeleniumTests {
 
     }
 
-    public static void main(String [] args) {
+    public static void main(String [] args) throws URISyntaxException {
         runTests();
     }
 }
