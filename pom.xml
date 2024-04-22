@@ -116,4 +116,12 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub phrocker Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/phrocker/SeleniumToolkit</url>
+        </repository>
+    </distributionManagement>
+
 </project>
