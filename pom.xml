@@ -11,7 +11,29 @@
 
     <!-- Project name and description -->
     <name>SeleniumToolkit</name>
-    <description>A toolkit for Selenium testing.</description>
+    <description>A toolkit to make Selenium testing easier.</description>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Marc Parisi</name>
+            <email>phrocker@apache.org</email>
+            <organization>DataGuardians, LLC</organization>
+            <organizationUrl>https://www.dataguardians.io</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/phrocker/SeleniumToolkit.git</connection>
+        <developerConnection>scm:git:ssh://github.com:phrocker/SeleniumToolkit.git</developerConnection>
+        <url>http://github.com/phrocker/SeleniumToolkit/tree/main</url>
+    </scm>
 
     <!-- Properties for project -->
     <properties>
@@ -117,10 +139,13 @@
         </plugins>
     </build>
     <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
-            <id>github</id>
-            <name>GitHub phrocker Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/phrocker/SeleniumToolkit</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
 
