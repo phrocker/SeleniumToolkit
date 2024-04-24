@@ -1,7 +1,7 @@
 # SeleniumToolkit
 
-Toolkit for Selenium testing. This is a project I've maintained for quite some time; however, after using it on a professional project
-I've decided to make it public. The Test directory contains a demo agains TestSauceDemo. It simply logs in and does very simple validation
+Toolkit for Selenium testing and automation. This is a project I've maintained for quite some time; however, after using it on a professional project
+I've decided to make it public. The Test directory contains a demo against TestSauceDemo. It simply logs in and does very simple validation
 but it functions as an example.
 
 ## Yaml DEMO
