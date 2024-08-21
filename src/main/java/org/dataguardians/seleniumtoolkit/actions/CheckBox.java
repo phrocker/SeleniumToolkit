@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebElement;
 
 
+/**
+ * Class to represent a check box
+ */
 @Slf4j
 @SuperBuilder(toBuilder = true)
 @Getter

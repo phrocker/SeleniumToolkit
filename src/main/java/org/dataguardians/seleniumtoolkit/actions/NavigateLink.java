@@ -15,6 +15,9 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+/**
+ * Class to represent a navigate link
+ */
 @Slf4j
 @SuperBuilder(toBuilder = true)
 @Getter
@@ -23,12 +26,26 @@ import java.util.List;
 @ToString
 public class NavigateLink extends PageAction{
 
+    /**
+     * The partial URL
+     */
     public String partialUrl;
 
+    /**
+     * The id of the element
+     */
     public String id;
 
+    /**
+     * The duration in milliseconds
+     */
     Integer waitMs = 125;
 
+    /**
+     * Navigate to the partial URL
+     * @param container the search context
+     * @param driver the web driver
+     */
     @Override
     public void performAction(SearchContext container, WebDriver driver) {
         if (StringUtils.isNotBlank(partialUrl)) {

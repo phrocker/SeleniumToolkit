@@ -33,8 +33,13 @@ import java.util.stream.Collectors;
 public class SeleniumTests {
 
 
-
-
+    /**
+     * Execute a test
+     * @param job the name of the job
+     * @param driver the web driver
+     * @param pe the page executions
+     * @return true if the test passed
+     */
     public static boolean execute(String job, @NonNull WebDriver driver, @NonNull PageExecutions pe ){
         if (StringUtils.isNotEmpty(pe.getStartUrl())){
             log.debug("Setting url to " + pe.getStartUrl());

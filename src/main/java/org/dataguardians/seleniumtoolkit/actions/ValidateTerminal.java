@@ -45,11 +45,9 @@ public class ValidateTerminal extends PageValidation{
         List<WebElement> elements = driver.findElements(By.className(buttonName));
         do {
             for (var element : elements) {
-                System.out.println("45 " + text + " " + regex);
-                System.out.println("46 " + element.getText() + " ");
-                if (StringUtils.isNotEmpty(text)) {
+              if (StringUtils.isNotEmpty(text)) {
                     if (element.getText().contains(text)) {
-                        System.out.println("checking " + element.getText());
+                        log.debug("checking {}", element.getText());
                         found = true;
                         break;
                     }
@@ -57,17 +55,17 @@ public class ValidateTerminal extends PageValidation{
                 if (StringUtils.isNotEmpty(regex)) {
                     Matcher matcher = pattern.matcher(element.getText());
                     if (matcher.find()) {
-                        System.out.println(" * ** matches " + element.getText());
+                        log.debug(" * ** matches {}", element.getText());
                         found = true;
                         break;
                     } else {
-                        System.out.println("Did not match " + element.getText() + " to " + regex);
+                        log.debug("Did not match " + element.getText() + " to " + regex);
                     }
                 }
             }
             if (wait > 0) {
                 try {
-                    System.out.println("Waiting for " + text + " " + regex + " " + wait + "ms");
+                    log.debug("Waiting for " + text + " " + regex + " " + wait + "ms");
                     Thread.sleep(50);
                     wait -= 50;
                 } catch (InterruptedException e) {
@@ -75,7 +73,6 @@ public class ValidateTerminal extends PageValidation{
                 }
             }
         }while (!found && wait > 0);
-            //}
         return found;
         }
 

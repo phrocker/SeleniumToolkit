@@ -4,7 +4,7 @@
     <!-- Project coordinates -->
     <groupId>io.dataguardians</groupId>
     <artifactId>seleniumtoolkit</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <packaging>jar</packaging>
 
     <!-- Project name and description -->

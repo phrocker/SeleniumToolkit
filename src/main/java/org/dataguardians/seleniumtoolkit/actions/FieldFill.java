@@ -11,6 +11,9 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+/**
+ * Class to represent a field fill
+ */
 @Slf4j
 @SuperBuilder(toBuilder = true)
 @Getter
@@ -21,6 +24,11 @@ public class FieldFill extends PageAction{
     public String field;
     public String value;
 
+    /**
+     * Fill the field with the value.
+     * @param container the search context
+     * @param driver the web driver
+     */
     @Override
     public void performAction(SearchContext container, WebDriver driver) {
         log.debug("action on " + field);

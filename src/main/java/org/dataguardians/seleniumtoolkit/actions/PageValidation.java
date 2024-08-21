@@ -15,9 +15,17 @@ import org.openqa.selenium.WebDriver;
 @NoArgsConstructor
 public abstract class PageValidation extends PageExecutable {
 
+    /**
+     * Boolean to indicate we stop on failure.
+     */
     @Builder.Default
     protected Boolean stopOnFailure = false;
 
+    /**
+     * Validation base.
+     * @param driver web driver.
+     * @return boolean if successful.
+     */
     public abstract boolean validate(WebDriver driver);
 
     public boolean fail() {

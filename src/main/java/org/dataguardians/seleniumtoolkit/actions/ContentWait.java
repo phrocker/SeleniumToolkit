@@ -14,19 +14,36 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+/**
+ * Class to represent a wait for content
+ */
 @SuperBuilder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor
 public class ContentWait extends IdWait{
 
+    /**
+     * The id of the element
+     */
     public String id;
 
+    /**
+     * The duration in milliseconds
+     */
     @Builder.Default
     Long durationMs = 10000L;
 
+    /**
+     * The regex to match
+     */
     String regex;
 
+    /**
+     * Perform the action
+     * @param container the search context
+     * @param driver the web driver
+     */
     @Override
     public void performAction(SearchContext container, WebDriver driver) {
         if (null != id && isVariable(id)){

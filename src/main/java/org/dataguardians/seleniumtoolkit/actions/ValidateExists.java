@@ -19,7 +19,6 @@ public class ValidateExists extends PageValidation{
 
     @Override
     public boolean validate(WebDriver driver) {
-//        System.out.println(driver.getPageSource());
         var result = driver.getPageSource().contains(text);
         return result;
     }
