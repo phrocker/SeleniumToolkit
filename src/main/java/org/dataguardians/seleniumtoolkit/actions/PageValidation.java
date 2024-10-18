@@ -21,6 +21,12 @@ public abstract class PageValidation extends PageExecutable {
     @Builder.Default
     protected Boolean stopOnFailure = false;
 
+    @Builder.Default
+    protected Integer retryCount = 0;
+
+    @Builder.Default
+    protected Integer retryDelay = 0;
+
     /**
      * Validation base.
      * @param driver web driver.
