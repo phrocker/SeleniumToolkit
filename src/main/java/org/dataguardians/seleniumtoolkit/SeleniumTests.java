@@ -35,12 +35,14 @@ public class SeleniumTests {
 
     /**
      * Execute a test
-     * @param job the name of the job
-     * @param driver the web driver
-     * @param pe the page executions
+     *
+     * @param job         the name of the job
+     * @param execOptions
+     * @param driver      the web driver
+     * @param pe          the page executions
      * @return true if the test passed
      */
-    public static boolean execute(String job, @NonNull WebDriver driver, @NonNull PageExecutions pe ){
+    public static boolean execute(String job, RunnerOptions execOptions, @NonNull WebDriver driver, @NonNull PageExecutions pe ){
         if (StringUtils.isNotEmpty(pe.getStartUrl())){
             log.debug("Setting url to " + pe.getStartUrl());
             driver.get(pe.getStartUrl());
@@ -52,12 +54,19 @@ public class SeleniumTests {
         }
         for(var subPe : pe.getDependsOn()) {
             log.debug("Running dependency:" + subPe.getName());
-            execute(job, driver, subPe);
+            execute(job, execOptions, driver, subPe);
         }
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         AtomicBoolean valid = new AtomicBoolean(true);
         for(var action : pe.getActions()){
+            if (null != execOptions.disabledCookies ) {
+                execOptions.disabledCookies.forEach( named -> {
+                        // log the cookie being deleted
+                        log.debug("Deleting cookie {}", named);
+                        driver.manage().deleteCookieNamed(named);
+                    });
+            }
             log.debug("Running " + action);
                 SearchContext container = driver;
                 if (action instanceof PageAction) {
@@ -110,7 +119,7 @@ public class SeleniumTests {
         return valid.get();
     }
 
-    public static void runTest(WebDriver driver, List<Map.Entry<String,Boolean>> executionResults, Path yamlFile) throws IOException {
+    public static void runTest(WebDriver driver, RunnerOptions execOptions, List<Map.Entry<String,Boolean>> executionResults, Path yamlFile) throws IOException {
         // Open an InputStream for each file
         try (InputStream inputStream = Files.newInputStream(yamlFile)) {
             // Handle the input stream (read content, etc.)
@@ -120,7 +129,7 @@ public class SeleniumTests {
                 log.trace("Running " + job);
                 PageExecutions pe = test.jobs.get(job);
                 try {
-                    executionResults.add(Maps.immutableEntry(job,execute(job, driver, pe) ));
+                    executionResults.add(Maps.immutableEntry(job,execute(job, execOptions, driver, pe) ));
                     //executionResults.add( "\t" + job + "\t" + execute(job, driver, pe) );
                 } catch (Exception e) {
                     executionResults.add(Maps.immutableEntry(job,false ));
@@ -141,8 +150,13 @@ public class SeleniumTests {
     }
 
     public static void runTestsDirectory(Path yamlDirectory, boolean headless) {
+        RunnerOptions execOptions = RunnerOptions.builder().headless(headless).build();
+        runTestsDirectory(yamlDirectory, execOptions);
+    }
+
+    public static void runTestsDirectory(Path yamlDirectory, RunnerOptions execOptions) {
         ChromeOptions options = new ChromeOptions();
-        if (headless) {
+        if (execOptions.isHeadless()) {
             options.addArguments("--headless=new");
         }
         WebDriver driver = new ChromeDriver(options);
@@ -161,7 +175,7 @@ public class SeleniumTests {
             // Read each file serially
             yamlFiles.forEach(file -> {
                 try {
-                    runTest(driver,executionResults,file);
+                    runTest(driver,execOptions, executionResults,file);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -180,7 +194,8 @@ public class SeleniumTests {
 
     public static List<Map.Entry<String,Boolean>> testTestFile(Path testFile, boolean headless) {
         ChromeOptions options = new ChromeOptions();
-        if (headless) {
+        RunnerOptions execOptions = RunnerOptions.builder().headless(headless).build();
+        if (execOptions.isHeadless()) {
             options.addArguments("--headless=new");
         }
         WebDriver driver = new ChromeDriver(options);
@@ -194,7 +209,7 @@ public class SeleniumTests {
             // Read each file serially
 
             try {
-                runTest(driver,executionResults,testFile);
+                runTest(driver, execOptions, executionResults,testFile);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
